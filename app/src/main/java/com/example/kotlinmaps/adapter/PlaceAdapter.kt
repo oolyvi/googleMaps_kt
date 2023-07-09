@@ -18,8 +18,6 @@ class PlaceAdapter(val placeList : List<Place>) : RecyclerView.Adapter<PlaceAdap
 
     }
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceHolder {
         val recyclerRowBinding = RecyclerRowBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return PlaceHolder(recyclerRowBinding)
@@ -33,9 +31,7 @@ class PlaceAdapter(val placeList : List<Place>) : RecyclerView.Adapter<PlaceAdap
         holder.recyclerRowBinding.recyclerViewTextView.text = placeList.get(position).name
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, MapsActivity::class.java)
-            //tiklandiqda save edilen bilgilerin gorunmesi
             intent.putExtra("selectedPlace", placeList.get(position))
-            //tiklandiqda ustdeki menudan, yoxsa evvelden save edilmis yerden gedildiyini mueyyenlesdirmek
             intent.putExtra("info", "old")
             holder.itemView.context.startActivity(intent)
         }
