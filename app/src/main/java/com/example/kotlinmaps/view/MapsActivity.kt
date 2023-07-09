@@ -85,18 +85,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
         val intent = intent
         val info = intent.getStringExtra("info")
 
-        //checking info is new or not, yeni save edilmis bir seydir, yoxsa yenisini yaratmaq isteyirik
         if (info == "new") {
 
             binding.saveButton.visibility = View.VISIBLE
             binding.deleteButton.visibility = View.GONE
 
-            //casting
             locationManager = this.getSystemService(LOCATION_SERVICE) as LocationManager
 
             locationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
-                    //bunu etdikde onLocationChanged 1defe cagirilir ve xeritede gezinende geriye qayitmir
 
                     trackBoolean = sharedPreferences.getBoolean("trackBoolean", false)
                     if (trackBoolean == false) {
@@ -111,16 +108,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 
 //PERMISSION PART
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                //rationale
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    //request permission
                     Snackbar.make(binding.root, "Permission needed for location!", Snackbar.LENGTH_INDEFINITE).setAction("Give permission") {
-                        //request permission from snacbar button
                         permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
                     }.show()
                 } else {
-                    //request permission
                     permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
                 }
@@ -128,7 +121,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 
             } else {
 
-                //permission granted
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
                 val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 if (lastLocation != null) {
@@ -141,7 +133,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 //PERMISSION PART
 
         } else {
-            //old info ise, tikladiqda evvelki bilgiler gorsenir
             mMap.clear()
 
             placeFromMain = intent.getSerializableExtra("selectedPlace") as? Place
@@ -169,7 +160,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
             if (result) {
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    //permission granted
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
                     val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                     if (lastLocation != null) {
@@ -180,13 +170,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 
                 }
             } else {
-                //permission denied
                 Toast.makeText(this@MapsActivity, "Permission needed!", Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    //Long click listener
     override fun onMapLongClick(p0: LatLng) {
 
         mMap.clear()
@@ -204,7 +192,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 
         if (selectedLatitude != null && selectedLongitude != null) {
             val place = Place(binding.placeText.text.toString(), selectedLatitude!!, selectedLongitude!!)
-            //RXJava part // handle response save etdikden sonra MainActivity'e intent eletdirir
             compositeDisposable.add(
                 placeDao.insert(place)
                     .subscribeOn(Schedulers.io())
@@ -223,7 +210,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLon
 
     fun delete(view : View) {
 
-        //eger yer null deyilse silinir, her ehtimala qarsi null safety edilir
         placeFromMain?.let {
             compositeDisposable.add(
                 placeDao.delete(it)
